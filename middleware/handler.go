@@ -71,7 +71,7 @@ func CustomerRequest(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(customer.Material)
 	// call insert stock function and pass the stock
-	partners := getMatchingPartners(customer)
+	partners := GetMatchingPartners(customer)
 	fmt.Println(len(partners))
 	var result []response
 	for _, partner := range partners {
@@ -101,7 +101,7 @@ func CustomerRequest(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func getMatchingPartners(customer models.Customer) []models.Partner {
+func GetMatchingPartners(customer models.Customer) []models.Partner {
 	db := createConnection()
 	defer db.Close()
 	sqlStatement := "SELECT p.id, p.name, p.radius, p.rating, a.lattitude, a.longitude " +
@@ -132,11 +132,11 @@ func getMatchingPartners(customer models.Customer) []models.Partner {
 
 func ListPartners(w http.ResponseWriter, r *http.Request) {
 	var partners []models.Partner
-	partners = getAllPartners()
+	partners = GetAllPartners()
 	json.NewEncoder(w).Encode(partners)
 }
 
-func getAllPartners() []models.Partner {
+func GetAllPartners() []models.Partner {
 	db := createConnection()
 	defer db.Close()
 	sqlStatement := "SELECT p.id, p.name, p.radius, p.rating, a.lattitude, a.longitude " +
@@ -171,7 +171,7 @@ func GetPartner(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var partner models.Partner
-	partner = getPartner(partnerId)
+	partner = GetPartnerFromId(partnerId)
 	if len(partner.PartnerName) == 0 {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -180,7 +180,7 @@ func GetPartner(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getPartner(id int) models.Partner {
+func GetPartnerFromId(id int) models.Partner {
 	db := createConnection()
 	defer db.Close()
 	var partner models.Partner
