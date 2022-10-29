@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  postgres:
+      image: postgres:12
+      container_name: "postgres-v12"
+      volumes:
+        - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      environment:
+        - "POSTGRES_DB=customermatching"
+        - "POSTGRES_PASSWORD=test"
+        - "POSTGRES_USER=test"
+        - "PGPORT=55432"
+      ports:
+        - "55432:55432"
