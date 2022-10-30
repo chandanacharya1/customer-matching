@@ -71,7 +71,9 @@ INSERT INTO partner (id, name, radius, rating)
 VALUES (1, 'Ikea', 50, 5),
        (2, 'Home24', 30, 4),
        (3, 'Wayfair', 45, 4.5),
-       (4, 'Floors GmBH', 25, 3);
+       (4, 'Floors GmBH', 25, 3),
+       (5, 'Tiles and more', 25, 5),
+       (6, 'Home24', 35, 5);
 
 INSERT INTO materials (id, name)
     overriding system value
@@ -79,14 +81,26 @@ VALUES (1, 'wood'),
        (2, 'carpet'),
        (3, 'tiles');
 
-
 INSERT INTO address (id, longitude, lattitude)
     overriding system value
-VALUES (1, 10.5, 50),
-       (2, 13.4, 52.382),
+VALUES (2, 13.4, 52.382),
        (3, 13.43, 52.5),
        (4, 13.15, 52),
-       (5, 10.5, 52.6);
+       (5, 10.5, 52.6),
+       (1, 13.08, 52.402),
+       (6, 13.41, 52.4),
+       (7, 13.431, 52.516);
+
+
+INSERT INTO partner_address (id, partnerid, addressid)
+    overriding system value
+VALUES (6, 1, 1),
+       (7, 2, 2),
+       (8, 3, 3),
+       (9, 4, 4),
+       (10, 1, 5),
+       (1, 5, 6),
+       (2, 6, 7);
 
 INSERT INTO partner_materials (id, partnerid, materialid)
     overriding system value
@@ -97,15 +111,12 @@ VALUES (1, 1, 1),
        (5, 2, 3),
        (6, 3, 1),
        (7, 2, 1),
-       (8, 1, 2);
-
-INSERT INTO partner_address (id, partnerid, addressid)
-    overriding system value
-VALUES (6, 1, 1),
-       (7, 2, 2),
-       (8, 3, 3),
-       (9, 4, 4),
-       (10, 1, 5);
+       (8, 1, 2),
+       (9, 5, 1),
+       (10, 5, 2),
+       (11, 6, 3),
+       (12, 6, 1),
+       (13, 6, 2);
 
 
 
