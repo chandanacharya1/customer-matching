@@ -16,3 +16,13 @@ type Partner struct {
 	AddressLat      float64 `json:"lattitude"`
 	AddressLong     float64 `json:"longitude"`
 }
+
+type Result struct {
+	ID              int64   `json:"id,omitempty"`
+	Name            string  `json:"name,omitempty"`
+	OperatingRadius int64   `json:"OperatingRadius,omitempty"`
+	Rating          float64 `json:"rating,omitempty"`
+	AddressLat      float64 `json:"lattitude"`
+	AddressLong     float64 `json:"longitude"`
+	Distance        float64 `json:"distance,omitempty"`
+}

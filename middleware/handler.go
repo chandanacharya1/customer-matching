@@ -2,32 +2,17 @@ package middleware
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"github.com/chandanacharya1/customer-matching/models"
-	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq" // postgres golang driver
+	"html/template"
 	"log"
 	"math"
 	"net/http"
 	"os"
 	"strconv"
 )
-
-type coordinate struct {
-	lat float64
-	lng float64
-}
-
-// response format
-type response struct {
-	ID              int64   `json:"id,omitempty"`
-	Name            string  `json:"name,omitempty"`
-	OperatingRadius int64   `json:"OperatingRadius,omitempty"`
-	Rating          float64 `json:"rating,omitempty"`
-	Distance        float64 `json:"distance,omitempty"`
-}
 
 // create connection with postgres db
 func createConnection() *sql.DB {
@@ -62,27 +47,40 @@ func createConnection() *sql.DB {
 	return db
 }
 func CustomerRequest(w http.ResponseWriter, r *http.Request) {
-	var customer models.Customer
-	// decode the json request to stock
-	err := json.NewDecoder(r.Body).Decode(&customer)
-
-	if err != nil {
-		log.Fatalf("Unable to decode the request body.  %v", err)
+	t, _ := template.ParseFiles("./www/pages/homepage.html")
+	//get Customer Inputs from FE
+	customerAdressLat, _ := strconv.ParseFloat(r.FormValue("latitude"), 64)
+	customerAdressLong, _ := strconv.ParseFloat(r.FormValue("longitude"), 64)
+	squareMeters, _ := strconv.ParseFloat(r.FormValue("squaremeters"), 64)
+	phoneNumber, _ := strconv.ParseInt(r.FormValue("phonenumber"), 10, 64)
+	customer := models.Customer{
+		Material:     r.FormValue("name"),
+		AddressLat:   customerAdressLat,
+		AddressLong:  customerAdressLong,
+		SquareMeters: squareMeters,
+		PhoneNumber:  phoneNumber,
 	}
-	fmt.Println(customer.Material)
+	/*	// decode the json request to stock
+		err := json.NewDecoder(r.Body).Decode(&customer)
+
+		if err != nil {
+			log.Fatalf("Unable to decode the request body.  %v", err)
+		}*/
 	// call insert stock function and pass the stock
+	emtpyPartner := make([]models.Partner, 0)
 	partners := GetMatchingPartners(customer)
-	fmt.Println(len(partners))
-	var result []response
+	var result []models.Result
 	for _, partner := range partners {
 		// find distance of each partner from customer's coordinates
 		dist := distance(customer.AddressLat, customer.AddressLong, partner.AddressLat, partner.AddressLong, "K")
 		// format a response object
-		res := response{
+		res := models.Result{
 			ID:              partner.PartnerID,
 			Name:            partner.PartnerName,
 			OperatingRadius: partner.OperatingRadius,
 			Rating:          partner.Rating,
+			AddressLat:      partner.AddressLat,
+			AddressLong:     partner.AddressLong,
 			Distance:        dist,
 		}
 		if dist < float64(res.OperatingRadius) {
@@ -95,9 +93,22 @@ func CustomerRequest(w http.ResponseWriter, r *http.Request) {
 			result[i], result[i+1] = result[i+1], result[i]
 		}
 	}
-	fmt.Println(result)
 	// send the response
-	json.NewEncoder(w).Encode(result)
+	m := struct {
+		AllPartner     []models.Partner
+		FoundPartner   []models.Partner
+		MatchedPartner []models.Result
+	}{
+		AllPartner:     emtpyPartner,
+		FoundPartner:   emtpyPartner,
+		MatchedPartner: result,
+	}
+	/*	json.NewEncoder(w).Encode(partners)*/
+	err := t.Execute(w, m)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 }
 
@@ -131,9 +142,26 @@ func GetMatchingPartners(customer models.Customer) []models.Partner {
 }
 
 func ListPartners(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("./www/pages/homepage.html")
 	var partners []models.Partner
+	emptyPartner := make([]models.Partner, 0)
+	emptyResult := make([]models.Result, 0)
 	partners = GetAllPartners()
-	json.NewEncoder(w).Encode(partners)
+	m := struct {
+		AllPartner     []models.Partner
+		FoundPartner   []models.Partner
+		MatchedPartner []models.Result
+	}{
+		AllPartner:     partners,
+		FoundPartner:   emptyPartner,
+		MatchedPartner: emptyResult,
+	}
+	/*	json.NewEncoder(w).Encode(partners)*/
+	err := t.Execute(w, m)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 }
 
 func GetAllPartners() []models.Partner {
@@ -142,8 +170,8 @@ func GetAllPartners() []models.Partner {
 	sqlStatement := "SELECT p.id, p.name, p.radius, p.rating, a.lattitude, a.longitude " +
 		"FROM partner p, address a, partner_address pa " +
 		"WHERE p.id = pa.partnerid " +
-		"AND a.id = pa.addressid " +
-		"ORDER BY p.rating DESC"
+		"AND a.id = pa.addressid"
+	/*"ORDER BY p.rating DESC"*/
 
 	rows, err := db.Query(sqlStatement)
 	if err != nil {
@@ -164,39 +192,83 @@ func GetAllPartners() []models.Partner {
 }
 
 func GetPartner(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	partnerId, err := strconv.Atoi(vars["partner_id"])
+	t, _ := template.ParseFiles("./www/pages/homepage.html")
+	partnerId, err := strconv.Atoi(r.FormValue("id"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	var partner models.Partner
-	partner = GetPartnerFromId(partnerId)
-	if len(partner.PartnerName) == 0 {
+	var partners []models.Partner
+	emptypartner := make([]models.Partner, 0)
+	emptyresult := make([]models.Result, 0)
+	partners = GetPartnerFromId(partnerId)
+	if len(partners) == 0 {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	} else {
-		json.NewEncoder(w).Encode(partner)
+		m := struct {
+			AllPartner     []models.Partner
+			FoundPartner   []models.Partner
+			MatchedPartner []models.Result
+		}{
+			AllPartner:     emptypartner,
+			FoundPartner:   partners,
+			MatchedPartner: emptyresult,
+		}
+		/*	json.NewEncoder(w).Encode(partners)*/
+		err := t.Execute(w, m)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 	}
 }
 
-func GetPartnerFromId(id int) models.Partner {
+func GetPartnerFromId(id int) []models.Partner {
 	db := createConnection()
 	defer db.Close()
-	var partner models.Partner
 	sqlStatement := "SELECT p.id, p.name, p.radius, p.rating, a.lattitude, a.longitude " +
 		"FROM partner p, address a, partner_address pa " +
 		"WHERE p.id = pa.partnerid " +
 		"AND a.id = pa.addressid " +
 		"AND p.id = $1 " +
 		"ORDER BY p.rating DESC"
-
-	err := db.QueryRow(sqlStatement, id).Scan(&partner.PartnerID, &partner.PartnerName, &partner.OperatingRadius,
-		&partner.Rating, &partner.AddressLat, &partner.AddressLong)
+	rows, err := db.Query(sqlStatement, id)
 	if err != nil {
-		log.Fatalf("Unable to scan the query result. %v", err)
+		log.Fatalf("Unable to execute the query. %v", err)
 	}
-	return partner
+	partners := make([]models.Partner, 0)
+	for rows.Next() {
+		var partner models.Partner
+		err := rows.Scan(&partner.PartnerID, &partner.PartnerName, &partner.OperatingRadius, &partner.Rating,
+			&partner.AddressLat, &partner.AddressLong)
+		if err != nil {
+			log.Fatalf("Unable to scan the query result. %v", err)
+		}
+		partners = append(partners, partner)
+	}
+	return partners
+}
+
+func Homepage(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("./www/pages/homepage.html")
+	emptypartner := make([]models.Partner, 0)
+	emptyresult := make([]models.Result, 0)
+	m := struct {
+		AllPartner     []models.Partner
+		FoundPartner   []models.Partner
+		MatchedPartner []models.Result
+	}{
+		AllPartner:     emptypartner,
+		FoundPartner:   emptypartner,
+		MatchedPartner: emptyresult,
+	}
+	w.Header().Set("Content-Type", "text/html")
+	err := t.Execute(w, m)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 }
 
 func distance(lat1 float64, lng1 float64, lat2 float64, lng2 float64, unit ...string) float64 {

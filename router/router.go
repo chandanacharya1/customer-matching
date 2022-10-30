@@ -12,11 +12,13 @@ func Router() *mux.Router {
 
 	router := mux.NewRouter()
 	/*router.HandleFunc("/api/jwt", middleware.GetJWT).Methods("POST", "OPTIONS")*/
-	router.HandleFunc("/api/login", middleware.Login).Methods("POST", "OPTIONS")
-	router.Handle("/api/request", middleware.Validate(middleware.CustomerRequest)).Methods("POST", "OPTIONS")
-	router.Handle("/api/partner", middleware.Validate(middleware.ListPartners)).Methods("GET", "OPTIONS")
-	router.Handle("/api/partner/{partner_id}", middleware.Validate(middleware.GetPartner)).Methods("GET")
-	fmt.Println("Starting API server on port 8080")
+	router.HandleFunc("/", middleware.Index)
+	router.Handle("/homepage", middleware.Validate(middleware.Homepage)).Methods("GET", "OPTIONS")
+	router.HandleFunc("/login", middleware.Login).Methods("POST", "OPTIONS")
+	router.Handle("/request", middleware.Validate(middleware.CustomerRequest)).Methods("POST", "OPTIONS")
+	router.Handle("/partner", middleware.Validate(middleware.ListPartners)).Methods("GET", "OPTIONS")
+	router.Handle("/getpartner", middleware.Validate(middleware.GetPartner)).Methods("GET")
+	fmt.Println("Starting web server on port 8080")
 	http.ListenAndServe(":8080", router)
 	return router
 }

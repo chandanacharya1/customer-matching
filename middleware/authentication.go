@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"encoding/json"
 	"github.com/dgrijalva/jwt-go"
+	"html/template"
 	"net/http"
 	"time"
 )
@@ -24,14 +24,25 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
-	var credentials Credentials
-	err := json.NewDecoder(r.Body).Decode(&credentials)
+func Index(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("./www/pages/login.html")
+	err := t.Execute(w, r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+}
 
+func Login(w http.ResponseWriter, r *http.Request) {
+	var credentials Credentials
+	/*	err := json.NewDecoder(r.Body).Decode(&credentials)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	*/
+	credentials.Username = r.FormValue("username")
+	credentials.Password = r.FormValue("password")
 	expectedPassword, ok := users[credentials.Username]
 
 	if !ok || expectedPassword != credentials.Password {
@@ -50,7 +61,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -62,7 +72,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			Value:   tokenString,
 			Expires: expirationTime,
 		})
-
+	http.Redirect(w, r, "/homepage", http.StatusSeeOther)
 }
 
 func Validate(next func(w http.ResponseWriter, r *http.Request)) http.Handler {

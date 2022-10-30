@@ -64,13 +64,13 @@ func TestGetAllPartners(t *testing.T) {
 
 func TestGetPartnerDetail(t *testing.T) {
 	partner := middleware.GetPartnerFromId(2)
-	if len(partner.PartnerName) == 0 {
+	if len(partner) == 0 {
 		failString := fmt.Sprintln("Partner 552 not found")
 		t.Fatalf(failString)
 	}
 
-	if partner.PartnerName != "Home24" {
-		failString := fmt.Sprintln("Partner Name not correct, should be 'Mr.Carpet' and is ", partner.PartnerName)
+	if partner[0].PartnerName != "Home24" {
+		failString := fmt.Sprintln("Partner Name not correct, should be 'Mr.Carpet' and is ", partner[0].PartnerName)
 		t.Fatalf(failString)
 	}
 
