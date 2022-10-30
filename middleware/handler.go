@@ -142,8 +142,8 @@ func GetAllPartners() []models.Partner {
 	sqlStatement := "SELECT p.id, p.name, p.radius, p.rating, a.lattitude, a.longitude " +
 		"FROM partner p, address a, partner_address pa " +
 		"WHERE p.id = pa.partnerid " +
-		"AND a.id = pa.addressid " +
-		"ORDER BY p.rating DESC"
+		"AND a.id = pa.addressid "
+	/*		"ORDER BY p.rating DESC"*/
 
 	rows, err := db.Query(sqlStatement)
 	if err != nil {
@@ -165,7 +165,7 @@ func GetAllPartners() []models.Partner {
 
 func GetPartner(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	partnerId, err := strconv.Atoi(vars["partner_id"])
+	partnerId, err := strconv.Atoi(vars["partnerid"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
