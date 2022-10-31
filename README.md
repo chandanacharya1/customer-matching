@@ -9,7 +9,7 @@ I have created the APIs that offers the following functionality:
 should be sorted by “best match”. The quality of the match is determined first on
 average rating and second by distance to the customer. (If the customer is not in the operating radius of the partner, the matched list won't have that partner in it. )
 `http:://localhost:8080/request` <br />
-2. List all the partners
+2. List all the partners <br />
 `http:://localhost:8080/partner`<br />
 3. For a specific partner, return the detailed partner data <br />
  
