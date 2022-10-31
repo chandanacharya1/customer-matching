@@ -65,6 +65,6 @@ This displays a list of best matched partners.
 (If there is a case when 2 matched partners have same rating, the partner with shortest distance will be
 displayed on top)
 
-If there are no best matches for entered details, ,status code 404 is returned.
+If there are no best matches for entered details, status code 404 is returned.
 
 ``
