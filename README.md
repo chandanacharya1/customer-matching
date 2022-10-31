@@ -40,11 +40,11 @@ copy the **TOKEN** returned as a response.
 
 #### To get list best matched partners
 We have to use the token received in the above call,
-replace <TOKEN> in the below curl with the token copied.
+replace **TOKEN** in the below curl with the token copied.
 
 `curl --location --request POST 'http://localhost:8081/api/request' \
 --header 'Content-Type: application/json' \
---header 'Token: <TOKEN>' \
+--header 'Token: TOKEN' \
 --data-raw '{
 "name": "tiles",
 "latitude": 52.59,
