@@ -7,7 +7,8 @@ based on the customer's project requirements.
 I have created the APIs that offers the following functionality:
 1. Based on a customer-request, return a list of partners that offer the service. The list
 should be sorted by “best match”. The quality of the match is determined first on
-average rating and second by distance to the customer. (If the customer is not in the operating radius of the partner, the matched list won't have that partner in it. )
+average rating and second by distance to the customer. (If the customer is not in the operating radius(kms) of the 
+partner, the matched list won't have that partner in it. )
 `http:://localhost:8080/request` <br />
 2. List all the partners <br />
 `http:://localhost:8080/partner`<br />
@@ -35,7 +36,7 @@ The web server runs on port 8080
 
 `curl --location --request POST 'http://localhost:8080/login' --header 'Access: test'`
 
-copy the <TOKEN> returned as a response.
+copy the **TOKEN** returned as a response.
 
 #### To get list best matched partners
 We have to use the token received in the above call,
@@ -53,6 +54,9 @@ replace <TOKEN> in the below curl with the token copied.
 }'`
 
 Returns a list of best matched partners.
+
+(If there is a case when 2 matched partners have same rating, the partner with shortest distance will be 
+displayed on top)
 
 #### To get a list of all partners
 We have to use the same token used in the above call,
