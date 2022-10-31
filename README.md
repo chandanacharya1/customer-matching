@@ -60,10 +60,10 @@ displayed on top)
 
 #### To get a list of all partners
 We have to use the same token used in the above call,
-replace <TOKEN> in the below curl with the token copied.
+replace **TOKEN** in the below curl with the token copied.
 
 `curl --location --request GET 'http://localhost:8080/partner' \
---header 'Token: <TOKEN>' \
+--header 'Token: TOKEN' \
 --header 'Content-Type: application/json' \
 --data-raw ''`
 
@@ -71,10 +71,10 @@ Returns a list of all partners.
 
 #### To get a details of particular partner
 We have to use the same token used in the above call,
-replace <TOKEN> in the below curl with the token copied.
+replace **TOKEN** in the below curl with the token copied.
 
 `curl --location --request GET 'http://localhost:8081/api/partner/6' \
---header 'Token: <TOKEN>' \
+--header 'Token: TOKEN' \
 --header 'Content-Type: application/json' \
 --data-raw ''`
 
