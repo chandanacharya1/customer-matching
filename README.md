@@ -8,14 +8,15 @@ I have created the APIs that offers the following functionality:
 1. Based on a customer-request, return a list of partners that offer the service. The list
 should be sorted by “best match”. The quality of the match is determined first on
 average rating and second by distance to the customer. (If the customer is not in the operating radius of the partner, the matched list won't have that partner in it. )
-
-`http:://localhost:8080/request`
-2. List all the partners
-
-`http:://localhost:8080/partner`
-3. For a specific partner, return the detailed partner data
-
-`http:://localhost:8080/partner/{partnerid}`
+<br />
+`http:://localhost:8080/request` <br />
+<br />
+2. List all the partners <br />
+`http:://localhost:8080/partner`<br />
+<br />
+3. For a specific partner, return the detailed partner data <br />
+   <br />
+`http:://localhost:8080/partner/{partnerid}`<br />
 
 For the challenge I have created a docker-compose.yml file.
 This creates a PostgreSQL database and inserts dummy data. The database contains multiple tables, 
@@ -67,7 +68,7 @@ replace <TOKEN> in the below curl with the token copied.
 
 Returns a list of all partners.
 
-### To get a details of particular partner
+#### To get a details of particular partner
 We have to use the same token used in the above call,
 replace <TOKEN> in the below curl with the token copied.
 
