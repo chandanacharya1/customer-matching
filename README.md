@@ -1,5 +1,5 @@
 # Matching Customer & Partner
-Coding challenge: The goal is to match the right partner (for ex:a craftsman) to a customer based on their project 
+The goal is to match the right partner (for ex:a craftsman) to a customer based on their project 
 requirements. In this particular challenge we concentrate on flooring. The aim is to propose partners to the customers 
 based on the customer's project requirements.
 
